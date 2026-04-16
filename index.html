@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Canchas F5 — Tu Pueblo</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div>
+      Canchas<span>F5</span>
+    </div>
+    <!-- Nav desktop -->
+    <nav class="desktop-nav">
+      <button class="active" onclick="goTab('canchas',this)">Canchas</button>
+      <button onclick="goTab('reservar',this)">Reservar</button>
+      <button onclick="goTab('admin',this)">Admin</button>
+    </nav>
+    <div class="pago-chip">Pago en cancha</div>
+  </header>
+
+  <main>
+
+    <!-- CANCHAS -->
+    <div class="section active" id="tab-canchas">
+      <div class="hero">
+        <div class="hero-badge">Tu pueblo — Todas las canchas</div>
+        <h2>Reserva tu turno<br><em>en segundos</em></h2>
+        <p>Elegí la cancha, el día y el horario. Sin llamadas, sin esperas.</p>
+      </div>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="canchas-grid" id="canchas-grid"></div>
+    </div>
+
+    <!-- RESERVAR -->
+    <div class="section" id="tab-reservar">
+      <div style="margin-bottom:20px;">
+        <div class="hero-badge" style="margin-bottom:0;">Paso a paso</div>
+        <h2
+          style="font-family:var(--font-display);font-size:clamp(22px,6vw,38px);font-weight:800;letter-spacing:-1px;margin-top:10px;">
+          Elegí cancha, fecha y hora</h2>
+      </div>
+
+      <!-- Barra de progreso (solo mobile) -->
+      <div class="steps-bar">
+        <div class="step-dot active" id="sdot-1"></div>
+        <div class="step-dot" id="sdot-2"></div>
+        <div class="step-dot" id="sdot-3"></div>
+      </div>
+
+      <div class="reservar-steps" id="reservar-steps">
+
+        <!-- Paso 1: Cancha -->
+        <div class="reservar-col-izq" id="col-izq">
+          <div class="panel">
+            <div class="panel-title"><span class="step-num">1</span>Cancha</div>
+            <div class="sel-canchas-h" id="sel-canchas"></div>
+          </div>
+
+          <!-- Paso 2: Calendario -->
+          <div class="panel">
+            <div class="panel-title"><span class="step-num">2</span>Fecha</div>
+            <div class="cal-nav-row">
+              <button class="cal-btn" onclick="cambiarMes(-1)">&#8592;</button>
+              <span class="cal-mes" id="cal-mes"></span>
+              <button class="cal-btn" onclick="cambiarMes(1)">&#8594;</button>
+            </div>
+            <div class="cal-days-header">
+              <div class="cal-day-lbl">Do</div>
+              <div class="cal-day-lbl">Lu</div>
+              <div class="cal-day-lbl">Ma</div>
+              <div class="cal-day-lbl">Mi</div>
+              <div class="cal-day-lbl">Ju</div>
+              <div class="cal-day-lbl">Vi</div>
+              <div class="cal-day-lbl">Sa</div>
+            </div>
+            <div class="cal-days" id="cal-days"></div>
+            <div class="horarios-wrap" id="horarios-wrap" style="display:none;">
+              <div class="horarios-title" id="horarios-titulo">Horarios</div>
+              <div class="horarios-grid" id="horarios-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 3: Formulario -->
+        <div>
+          <div class="panel">
+            <div class="panel-title"><span class="step-num">3</span>Tus datos</div>
+            <div id="form-content">
+              <div class="empty-state">
+                <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                Elegí una cancha, fecha y horario para continuar
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="section" id="tab-admin">
+      <div id="admin-login-section" class="admin-login-wrap">
+        <div class="panel">
+          <div class="admin-login-icon"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <h3>Panel de administración</h3>
+          <p>Ingresá tu contraseña para gestionar todas las reservas del pueblo</p>
+          <label>Contraseña</label>
+          <input type="password" id="admin-pass" placeholder="••••••••"
+            onkeydown="if(event.key==='Enter')loginAdmin()" />
+          <button class="btn-main" onclick="loginAdmin()">Ingresar al panel</button>
+        </div>
+      </div>
+      <div id="admin-panel" style="display:none;">
+        <div class="admin-header">
+          <div>
+            <h2>Panel de reservas</h2>
+            <p>Todas las canchas del pueblo</p>
+          </div>
+          <button class="btn-sm logout" onclick="logoutAdmin()">Cerrar sesión</button>
+        </div>
+        <div class="admin-stats" id="admin-stats"></div>
+        <div class="filtros" id="filtros">
+          <button class="filtro-btn active" onclick="setFiltro('todos',this)">Todos</button>
+          <button class="filtro-btn" onclick="setFiltro('pendiente',this)">Pendientes</button>
+          <button class="filtro-btn" onclick="setFiltro('confirmado',this)">Confirmados</button>
+          <button class="filtro-btn" onclick="setFiltro('hoy',this)">Hoy</button>
+        </div>
+        <div class="reservas-lista" id="reservas-lista"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="bnav-canchas" onclick="goTab('canchas', this, 'bnav-canchas')">
+      <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 13h18"/><path d="M12 3v18"/></svg></span>
+      <span>Canchas</span>
+    </button>
+    <button class="nav-item" id="bnav-reservar" onclick="goTab('reservar', this, 'bnav-reservar')">
+      <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+      <span>Reservar</span>
+    </button>
+    <button class="nav-item" id="bnav-admin" onclick="goTab('admin', this, 'bnav-admin')">
+      <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      <span>Admin</span>
+    </button>
+  </nav>
+
+  <div id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
