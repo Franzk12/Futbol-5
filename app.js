@@ -172,15 +172,18 @@ function actualizarForm() {
     <div class="resumen-reserva">
       <strong>${c.nombre}</strong> · ${c.dueno}<br>
       ${selFecha.split('-').reverse().join('/')} a las <strong>${selHora} hs</strong>
-      <div class="precio-tag">$${c.precio.toLocaleString()}</div>
+      <div class="precio-tag" id="precio-tag">$${c.precio.toLocaleString()}</div>
       <small style="color:var(--gris-texto)">Pago en cancha el día del turno</small>
     </div>
     <label>Tu nombre completo</label>
-    <input id="inp-nombre" type="text" placeholder="Ej: Lucas García" autocomplete="name" />
+    <input id="inp-nombre" type="text" placeholder="Ej: Lucas García" autocomplete="name" oninput="this.value=this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,'')" />
     <label>WhatsApp / Teléfono</label>
     <input id="inp-tel" type="tel" placeholder="Ej: 381 555-1234" autocomplete="tel" />
-    <label>Cantidad de jugadores</label>
-    <input id="inp-jug" type="number" min="2" max="10" value="10" inputmode="numeric" />
+    <label>Duración</label>
+    <select id="inp-duracion" onchange="document.getElementById('precio-tag').innerText = '$' + (${c.precio} * this.value).toLocaleString()">
+      <option value="1">1 hora</option>
+      <option value="2">2 horas</option>
+    </select>
     <button class="btn-main" onclick="confirmarReserva()">Confirmar reserva ✓</button>
   `;
 }
@@ -188,9 +191,30 @@ function actualizarForm() {
 function confirmarReserva() {
   const nombre = document.getElementById('inp-nombre').value.trim();
   const tel = document.getElementById('inp-tel').value.trim();
-  const jug = document.getElementById('inp-jug').value;
+  const jug = 10;
+  
   if(!nombre||!tel) { toast('Completá nombre y WhatsApp',''); return; }
-  reservas.push({ id:nextId++, canchaId:selCancha, fecha:selFecha, hora:selHora, nombre, tel, jugadores:jug, estado:'pendiente' });
+  if(!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) { toast('El nombre solo debe contener letras',''); return; }
+  
+  const telSoloNumeros = tel.replace(/[\s\-\+]/g, '');
+  if(!/^\d+$/.test(telSoloNumeros)) { toast('El teléfono debe contener un número válido',''); return; }
+
+  const durP = document.getElementById('inp-duracion');
+  const duracion = durP ? parseInt(durP.value) : 1;
+  let horasAReservar = [selHora];
+  
+  if (duracion === 2) {
+    const nextH = String(parseInt(selHora) + 1).padStart(2,'0') + ':00';
+    if (!HORAS.includes(nextH)) { toast('No es posible reservar 2 horas porque el complejo cierra más tarde',''); return; }
+    const ocupado = reservas.some(r => r.canchaId === selCancha && r.fecha === selFecha && r.hora === nextH);
+    if (ocupado) { toast('La hora siguiente ya está reservada. ¡Elige 1 hora o busca otro hueco!',''); return; }
+    horasAReservar.push(nextH);
+  }
+
+  horasAReservar.forEach(h => {
+    reservas.push({ id:nextId++, canchaId:selCancha, fecha:selFecha, hora:h, nombre, tel, jugadores:jug, estado:'pendiente' });
+  });
+
   toast('¡Reserva enviada! El dueño la confirmará pronto','verde');
   selFecha=null; selHora=null;
   renderCal(); renderHorarios(); actualizarForm(); renderCanchas(); actualizarStepBar();
@@ -251,7 +275,7 @@ function renderAdminPanel() {
         <div class="reserva-body">
           <div class="reserva-nombre">${r.nombre}</div>
           <div class="reserva-detalle">
-            ${c?c.nombre:''} · ${r.fecha.split('-').reverse().join('/')} · ${r.hora} hs · ${r.jugadores} jug.<br>
+            ${c?c.nombre:''} · ${r.fecha.split('-').reverse().join('/')} · ${r.hora} hs<br>
             Tel: ${r.tel}
           </div>
         </div>
